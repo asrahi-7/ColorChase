@@ -203,6 +203,33 @@
     <div id="gameOverMessage">
         <p id="performanceText"></p>
     </div>
+// Keyboard support for PC/Laptop
+document.addEventListener('keydown', e => {
+    if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+        activeTouches.add('left');
+    }
+    if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+        activeTouches.add('right');
+    }
+    if ((e.code === 'ArrowUp' || e.code === 'Space') && gameState.player.jumpCount < 2) {
+        handleButtonPress('jump');
+    }
+    if (e.code === 'KeyP') {
+        gameState.isPaused = !gameState.isPaused; // toggle pause with "P"
+    }
+    if (e.code === 'KeyR') {
+        resetGame(); // restart with "R"
+    }
+});
+
+document.addEventListener('keyup', e => {
+    if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+        activeTouches.delete('left');
+    }
+    if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+        activeTouches.delete('right');
+    }
+});
 
     <script>
         // Game initialization
