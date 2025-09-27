@@ -40,6 +40,11 @@
             border: 4px solid #fff;
             border-radius: 15px;
             box-shadow: 0 0 40px rgba(0,0,0,0.3);
+            /* --- MODIFIED FOR RESPONSIVENESS --- */
+            width: 95vw; /* Use 95% of the viewport width */
+            max-width: 800px; /* But don't let it get bigger than the original size */
+            aspect-ratio: 2 / 1; /* Always keep the 2:1 width-to-height ratio */
+            height: auto; /* Let the height adjust automatically */
         }
 
         #controls {
@@ -208,8 +213,10 @@
         // Game initialization
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = 800;
-        canvas.height = 400;
+        
+        // --- REMOVED fixed canvas size. It will now be set dynamically. ---
+        // canvas.width = 800;
+        // canvas.height = 400;
 
         let gameState = {
             player: { x: 200, y: 300, dx: 0, dy: 0, jumpCount: 0 },
@@ -223,6 +230,20 @@
 
         // Update high score display
         document.getElementById('highScore').textContent = gameState.highScore;
+
+        // --- ADDED: Function to handle resizing the game ---
+        function resizeGame() {
+            // Get the actual size the canvas is being displayed at
+            const newWidth = canvas.clientWidth;
+            const newHeight = canvas.clientHeight;
+            
+            // Update the drawing surface to match the new size
+            if (canvas.width !== newWidth || canvas.height !== newHeight) {
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+            }
+        }
+        // --- END of added section ---
 
         // Touch handling
         let activeTouches = new Set();
@@ -244,7 +265,7 @@
             if (e.target.closest('button')) handleButtonPress(e.target.id);
         });
 
-        // --- ADDED: Keyboard handling for PC/Laptop ---
+        // Keyboard handling for PC/Laptop
         document.addEventListener('keydown', e => {
             switch(e.key) {
                 case 'ArrowLeft':
@@ -279,7 +300,6 @@
                     break;
             }
         });
-        // --- END of added section ---
 
         function handleButtonPress(id) {
             activeTouches.add(id);
@@ -309,10 +329,12 @@
             gameState.player.y += gameState.player.dy;
 
             // Gravity
-            if (gameState.player.y + 50 < 350) {
+            // --- MODIFIED: Use canvas.height for dynamic ground position ---
+            const groundY = canvas.height - 50;
+            if (gameState.player.y + 50 < groundY) {
                 gameState.player.dy += 0.5;
             } else {
-                gameState.player.y = 300;
+                gameState.player.y = groundY - 50; // Place player on the ground
                 gameState.player.dy = 0;
                 gameState.player.jumpCount = 0;
             }
@@ -338,6 +360,9 @@
         }
 
         function draw() {
+            // --- ADDED: Check canvas size before every draw call ---
+            resizeGame();
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             // Draw player
@@ -401,7 +426,7 @@
 
         function resetGame() {
             gameState = {
-                player: { x: 200, y: 300, dx: 0, dy: 0, jumpCount: 0 },
+                player: { x: canvas.width / 4, y: canvas.height - 100, dx: 0, dy: 0, jumpCount: 0 }, // Use dynamic start positions
                 obstacles: [],
                 coins: [],
                 score: 0,
@@ -418,7 +443,7 @@
             if (!gameState.isGameOver && !gameState.isPaused) {
                 gameState.obstacles.push({
                     x: canvas.width,
-                    y: 320,
+                    y: canvas.height - 80, // --- MODIFIED: Dynamic Y position
                     width: 50,
                     height: 50,
                     emoji: ["🚧","🚗","👾"][Math.floor(Math.random()*3)],
@@ -444,6 +469,13 @@
             draw();
             requestAnimationFrame(gameLoop);
         }
+        
+        // --- ADDED: Listen for window resize events to adjust the game ---
+        window.addEventListener('resize', resizeGame);
+
+        // --- ADDED: Initialize the game size on first load ---
+        resetGame(); 
+        
         gameLoop();
     </script>
 </body>
