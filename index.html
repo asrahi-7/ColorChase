@@ -175,8 +175,8 @@
     <canvas id="gameCanvas"></canvas>
     <div id="instructions">
         <h2>How to Play</h2>
-        <p>Use the <strong>⬅️</strong> and <strong>➡️</strong> buttons to move left and right.</p>
-        <p>Press the <strong>🦘</strong> button to jump.</p>
+        <p>Use the <strong>⬅️</strong> and <strong>➡️</strong> buttons or <strong>Arrow/A/D</strong> keys to move.</p>
+        <p>Press the <strong>🦘</strong> button or <strong>Spacebar/Up Arrow/W</strong> to jump.</p>
         <p>Avoid obstacles and collect coins to score points!</p>
         <p>Made with ❤️ by <a href="https://t.me/asrahi_07" target="_blank" onclick="window.open('https://t.me/asrahi_07', '_blank'); return false;">AS Rahi</a></p>
     </div>
@@ -203,33 +203,6 @@
     <div id="gameOverMessage">
         <p id="performanceText"></p>
     </div>
-// Keyboard support for PC/Laptop
-document.addEventListener('keydown', e => {
-    if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
-        activeTouches.add('left');
-    }
-    if (e.code === 'ArrowRight' || e.code === 'KeyD') {
-        activeTouches.add('right');
-    }
-    if ((e.code === 'ArrowUp' || e.code === 'Space') && gameState.player.jumpCount < 2) {
-        handleButtonPress('jump');
-    }
-    if (e.code === 'KeyP') {
-        gameState.isPaused = !gameState.isPaused; // toggle pause with "P"
-    }
-    if (e.code === 'KeyR') {
-        resetGame(); // restart with "R"
-    }
-});
-
-document.addEventListener('keyup', e => {
-    if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
-        activeTouches.delete('left');
-    }
-    if (e.code === 'ArrowRight' || e.code === 'KeyD') {
-        activeTouches.delete('right');
-    }
-});
 
     <script>
         // Game initialization
@@ -270,6 +243,43 @@ document.addEventListener('keyup', e => {
         document.addEventListener('mousedown', e => {
             if (e.target.closest('button')) handleButtonPress(e.target.id);
         });
+
+        // --- ADDED: Keyboard handling for PC/Laptop ---
+        document.addEventListener('keydown', e => {
+            switch(e.key) {
+                case 'ArrowLeft':
+                case 'a':
+                    activeTouches.add('left');
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                    activeTouches.add('right');
+                    break;
+                case 'ArrowUp':
+                case 'w':
+                case ' ': // Spacebar for jump
+                    e.preventDefault(); // Prevent page scroll on spacebar
+                    if (!gameState.isGameOver && !gameState.isPaused && gameState.player.jumpCount < 2) {
+                        gameState.player.dy = -12;
+                        gameState.player.jumpCount++;
+                    }
+                    break;
+            }
+        });
+
+        document.addEventListener('keyup', e => {
+            switch(e.key) {
+                case 'ArrowLeft':
+                case 'a':
+                    activeTouches.delete('left');
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                    activeTouches.delete('right');
+                    break;
+            }
+        });
+        // --- END of added section ---
 
         function handleButtonPress(id) {
             activeTouches.add(id);
@@ -370,7 +380,7 @@ document.addEventListener('keyup', e => {
             const difference = gameState.highScore - gameState.score;
             let message;
 
-            if (gameState.score === gameState.highScore) {
+            if (gameState.score > 0 && gameState.score >= gameState.highScore) {
                 message = "🎉 Wow! You're a LEGEND! 🎉<br>You just set a new high score!";
             } else if (difference <= 50) {
                 message = "😲 So close! You were just " + difference + " points away from the high score!";
@@ -438,4 +448,3 @@ document.addEventListener('keyup', e => {
     </script>
 </body>
 </html>
-i
