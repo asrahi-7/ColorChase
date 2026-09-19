@@ -2,7 +2,7 @@ Color Chase
 
 *An endless, fast-paced web runner. Dodge, jump, and grab every gem!*
 
-**[🎮 Play RapidRun Live Here!](https://asrahi-7.github.io/RapidRun/)**
+**[🎮 Play RapidRun Live Here!](https://asrahi-7.github.io/ColorChase/)**
 
 **RapidRun** (in-game title: *Color Chase*) is a highly responsive, physics-based infinite runner built entirely with pure web technologies. Control your emoji hero, weave through dangerous obstacles, and rack up high scores as the game's speed progressively ramps up. 
 
