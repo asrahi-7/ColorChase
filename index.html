@@ -1,483 +1,564 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Color Chase Game</title>
-    <style>
-        /* Prevent text selection on tap */
-        body {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            margin: 0;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-            touch-action: manipulation;
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            background-size: 400% 400%;
-            animation: gradientFlow 15s ease infinite, pulseBackground 5s ease infinite;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Color Chase</title>
+<style>
+  :root{
+    --bg-1:#0b0f2a;
+    --bg-2:#1a1147;
+    --accent:#00e5c7;
+    --accent-2:#ff3d81;
+    --gold:#ffd166;
+    --panel:rgba(15,18,45,0.72);
+    --text:#eef1ff;
+    --muted:#9aa3c7;
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{
+    height:100%;
+    overflow:hidden;
+    background:var(--bg-1);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    user-select:none;
+    -webkit-user-select:none;
+    touch-action:none;
+  }
+  #app{
+    position:fixed;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(0,229,199,0.18), transparent 45%),
+      radial-gradient(circle at 85% 90%, rgba(255,61,129,0.18), transparent 45%),
+      linear-gradient(160deg, var(--bg-1), var(--bg-2));
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    padding-left:env(safe-area-inset-left,0px);
+    padding-right:env(safe-area-inset-right,0px);
+  }
 
-        @keyframes gradientFlow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+  .hidden{display:none !important;}
 
-        @keyframes pulseBackground {
-            0% { opacity: 1; }
-            50% { opacity: 0.8; }
-            100% { opacity: 1; }
-        }
+  /* ---------- Overlay screens (menu, level select, how-to, game over) ---------- */
+  .screen{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    padding:24px;
+    text-align:center;
+    overflow-y:auto;
+  }
+  .logo{
+    font-size:clamp(28px,7vw,46px);
+    font-weight:800;
+    letter-spacing:0.5px;
+    background:linear-gradient(90deg,var(--accent),var(--gold));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    text-shadow:0 0 30px rgba(0,229,199,0.25);
+  }
+  .tagline{color:var(--muted);font-size:clamp(13px,3vw,16px);margin-bottom:6px;}
+  .stat-row{
+    display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:8px;
+  }
+  .stat-pill{
+    background:var(--panel);
+    border:1px solid rgba(255,255,255,0.08);
+    padding:8px 16px;border-radius:999px;
+    font-weight:700;font-size:clamp(13px,3vw,15px);
+  }
+  .btn{
+    appearance:none;border:none;cursor:pointer;
+    font-family:inherit;font-weight:700;font-size:clamp(15px,3.6vw,18px);
+    padding:14px 28px;border-radius:16px;
+    width:min(280px,80vw);
+    color:#08101f;
+    background:linear-gradient(135deg,var(--accent),#4bd3ff);
+    box-shadow:0 8px 20px rgba(0,229,199,0.28);
+    transition:transform .08s ease;
+  }
+  .btn:active{transform:scale(0.95);}
+  .btn.secondary{
+    background:rgba(255,255,255,0.08);
+    color:var(--text);
+    box-shadow:none;
+    border:1px solid rgba(255,255,255,0.14);
+  }
+  .btn.warn{
+    background:linear-gradient(135deg,var(--accent-2),#ff7ab0);
+    color:#1a0410;
+    box-shadow:0 8px 20px rgba(255,61,129,0.28);
+  }
+  .btn-row{display:flex;flex-direction:column;gap:10px;align-items:center;margin-top:6px;}
 
-        canvas {
-            background: rgba(255, 255, 255, 0.9);
-            display: block;
-            position: absolute;
-            top: 15%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 4px solid #fff;
-            border-radius: 15px;
-            box-shadow: 0 0 40px rgba(0,0,0,0.3);
-            /* --- MODIFIED FOR RESPONSIVENESS --- */
-            width: 95vw; /* Use 95% of the viewport width */
-            max-width: 800px; /* But don't let it get bigger than the original size */
-            aspect-ratio: 2 / 1; /* Always keep the 2:1 width-to-height ratio */
-            height: auto; /* Let the height adjust automatically */
-        }
+  .diff-card{
+    width:min(320px,84vw);
+    background:var(--panel);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:18px;
+    padding:16px 18px;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    cursor:pointer;
+  }
+  .diff-card:active{transform:scale(0.97);}
+  .diff-card .label{text-align:left;}
+  .diff-card .name{font-weight:800;font-size:16px;}
+  .diff-card .desc{color:var(--muted);font-size:12px;}
+  .diff-easy{border-color:rgba(0,229,199,0.4);}
+  .diff-normal{border-color:rgba(255,209,102,0.4);}
+  .diff-hard{border-color:rgba(255,61,129,0.4);}
 
-        #controls {
-            position: fixed;
-            bottom: 5vh;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 10vw;
-            z-index: 100;
-        }
+  .howto-list{
+    max-width:420px;text-align:left;color:var(--muted);
+    background:var(--panel);border-radius:16px;padding:16px 20px;
+    font-size:clamp(13px,3.2vw,15px);line-height:1.7;
+    border:1px solid rgba(255,255,255,0.08);
+  }
+  .howto-list b{color:var(--text);}
+  .credit{color:var(--muted);font-size:12px;margin-top:4px;}
+  .credit a{color:var(--accent);text-decoration:none;font-weight:700;}
 
-        button {
-            font-size: 15vw;
-            cursor: pointer;
-            border: none;
-            width: 30vw;
-            height: 30vw;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255,255,255,0.9);
-            color: #000;
-            box-shadow: 0 0 30px rgba(0,0,0,0.3);
-            transition: all 0.1s;
-        }
+  /* ---------- Game screen ---------- */
+  #gameScreen{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+  }
+  #hud{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px 14px;gap:8px;flex-shrink:0;
+  }
+  #hud .stats{display:flex;gap:8px;flex-wrap:wrap;}
+  #hud .stat-pill{padding:6px 12px;font-size:13px;}
+  #pauseBtn{
+    width:42px;height:42px;border-radius:50%;border:none;
+    background:var(--panel);color:var(--text);font-size:18px;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    border:1px solid rgba(255,255,255,0.1);
+  }
+  #canvasWrap{
+    flex:1;
+    min-height:0;
+    display:flex;
+    padding:0 10px;
+  }
+  #gameCanvas{
+    flex:1;
+    width:100%;
+    height:100%;
+    display:block;
+    background:linear-gradient(180deg,#0e1638,#141c42);
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,0.08);
+    box-shadow:0 0 40px rgba(0,0,0,0.35) inset;
+  }
+  #controls{
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8vw;
+    padding:14px 20px calc(14px + env(safe-area-inset-bottom,0px));
+  }
+  .action-btn{
+    border:none;border-radius:50%;
+    background:rgba(255,255,255,0.94);
+    color:#0b0f2a;
+    font-size:clamp(22px,7vw,30px);
+    width:clamp(58px,17vw,74px);
+    height:clamp(58px,17vw,74px);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 18px rgba(0,0,0,0.35);
+  }
+  .action-btn:active{transform:scale(0.86);background:rgba(255,255,255,0.7);}
+  #jumpBtn{background:linear-gradient(135deg,var(--accent),#4bd3ff);}
 
-        button:active {
-            transform: scale(0.85);
-            background: rgba(255,255,255,0.7);
-        }
-
-        #scoreBoard {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: white;
-            font-size: 6vw;
-            background: rgba(0,0,0,0.5);
-            padding: 2vw 4vw;
-            border-radius: 10px;
-            text-align: center;
-            backdrop-filter: blur(5px);
-        }
-
-        #gameOverMessage {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            font-size: 4vw;
-            display: none;
-            z-index: 200;
-        }
-
-        #instructions {
-            position: fixed;
-            bottom: 40vh;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            font-size: 3vw;
-            color: #333;
-            box-shadow: 0 0 30px rgba(0,0,0,0.3);
-            z-index: 100;
-        }
-
-        #instructions h2 {
-            margin: 0 0 10px;
-            font-size: 4vw;
-            color: #ff3366;
-        }
-
-        #instructions p {
-            margin: 5px 0;
-        }
-
-        #instructions a {
-            color: #23a6d5;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        #instructions a:hover {
-            text-decoration: underline;
-        }
-
-        #gameControls {
-            position: fixed;
-            bottom: 20vh;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 5vw;
-            z-index: 100;
-        }
-
-        #gameControls button {
-            font-size: 5vw;
-            width: 20vw;
-            height: 20vw;
-            border-radius: 15px;
-            background: rgba(255, 255, 255, 0.9);
-            color: #000;
-            box-shadow: 0 0 20px rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-
-        #gameControls button span {
-            font-size: 3vw;
-            margin-top: 5px;
-        }
-    </style>
+  @media (min-width:700px){
+    #canvasWrap{padding:0 40px;}
+    #gameCanvas{max-width:1100px;margin:0 auto;}
+  }
+  @media (max-height:480px) and (orientation:landscape){
+    #hud{padding:6px 12px;}
+    #controls{padding:8px 20px calc(8px + env(safe-area-inset-bottom,0px));}
+    .action-btn{width:clamp(48px,10vh,60px);height:clamp(48px,10vh,60px);font-size:clamp(18px,4vh,24px);}
+  }
+</style>
 </head>
 <body>
-    <div id="scoreBoard">
-        <div>⭐ SCORE: <span id="score">0</span></div>
-        <div>🏆 HIGH: <span id="highScore">0</span></div>
+<div id="app">
+
+  <!-- Home -->
+  <div id="homeScreen" class="screen">
+    <div class="logo">COLOR CHASE</div>
+    <div class="tagline">Dodge, jump, and grab every gem you can.</div>
+    <div class="stat-row">
+      <div class="stat-pill">🏆 High Score: <span id="menuHigh">0</span></div>
     </div>
-    <canvas id="gameCanvas"></canvas>
-    <div id="instructions">
-        <h2>How to Play</h2>
-        <p>Use the <strong>⬅️</strong> and <strong>➡️</strong> buttons or <strong>Arrow/A/D</strong> keys to move.</p>
-        <p>Press the <strong>🦘</strong> button or <strong>Spacebar/Up Arrow/W</strong> to jump.</p>
-        <p>Avoid obstacles and collect coins to score points!</p>
-        <p>Made with ❤️ by <a href="https://t.me/asrahi_07" target="_blank" onclick="window.open('https://t.me/asrahi_07', '_blank'); return false;">AS Rahi</a></p>
+    <div class="btn-row">
+      <button class="btn" id="playBtn">▶️ Play</button>
+      <button class="btn secondary" id="howToBtn">❓ How to Play</button>
     </div>
-    <div id="gameControls">
-        <button id="playButton">
-            ▶️
-            <span>Play</span>
-        </button>
-        <button id="pauseButton">
-            ⏸️
-            <span>Pause</span>
-        </button>
-        <button id="restartButton">
-            🔄
-            <span>Restart</span>
-        </button>
+    <div class="credit">Made with ❤️ by <a href="https://github.com/asrahi-7" target="_blank" rel="noopener">AS Rahi</a></div>
+  </div>
+
+  <!-- Level select -->
+  <div id="levelScreen" class="screen hidden">
+    <div class="logo" style="font-size:clamp(22px,5.5vw,30px);">Select Speed</div>
+    <div class="diff-card diff-easy" data-speed="1">
+      <div class="label"><div class="name">🚶 Easy</div><div class="desc">Chill pace, great for warming up</div></div>
+    </div>
+    <div class="diff-card diff-normal" data-speed="1.5">
+      <div class="label"><div class="name">🏃 Normal</div><div class="desc">A steady challenge</div></div>
+    </div>
+    <div class="diff-card diff-hard" data-speed="2.2">
+      <div class="label"><div class="name">🏎️ Hard</div><div class="desc">Fast reflexes required</div></div>
+    </div>
+    <button class="btn secondary" id="levelBackBtn">Back</button>
+  </div>
+
+  <!-- How to play -->
+  <div id="howToScreen" class="screen hidden">
+    <div class="logo" style="font-size:clamp(22px,5.5vw,30px);">How to Play</div>
+    <div class="howto-list">
+      <div>⬅️ ➡️ &nbsp;<b>Move</b> — tap the arrow buttons, or use <b>A/D</b> or the <b>Arrow Keys</b>.</div><br>
+      <div>🦘 &nbsp;<b>Jump</b> — tap the jump button, or press <b>Space</b>, <b>W</b>, or <b>Up Arrow</b>. You get a double jump!</div><br>
+      <div>💎 &nbsp;Collect gems for points. 🚧🔥👾 obstacles end your run — dodge them!</div><br>
+      <div>The game speeds up the longer you survive. Beat your high score.</div>
+    </div>
+    <button class="btn secondary" id="howToBackBtn">Back</button>
+  </div>
+
+  <!-- Game -->
+  <div id="gameScreen" class="hidden">
+    <div id="hud">
+      <div class="stats">
+        <div class="stat-pill">⭐ <span id="score">0</span></div>
+        <div class="stat-pill">💎 <span id="gems">0</span></div>
+        <div class="stat-pill">🏆 <span id="highScore">0</span></div>
+      </div>
+      <button id="pauseBtn">⏸️</button>
+    </div>
+    <div id="canvasWrap">
+      <canvas id="gameCanvas"></canvas>
     </div>
     <div id="controls">
-        <button id="left">⬅️</button>
-        <button id="jump">🦘</button>
-        <button id="right">➡️</button>
+      <button class="action-btn" id="left">⬅️</button>
+      <button class="action-btn" id="jumpBtn">🦘</button>
+      <button class="action-btn" id="right">➡️</button>
     </div>
+  </div>
 
-    <div id="gameOverMessage">
-        <p id="performanceText"></p>
+  <!-- Game over -->
+  <div id="gameOverScreen" class="screen hidden">
+    <div class="logo" style="font-size:clamp(24px,6vw,34px);">GAME OVER</div>
+    <div id="performanceText" class="howto-list" style="text-align:center;"></div>
+    <div class="btn-row">
+      <button class="btn" id="playAgainBtn">🔄 Play Again</button>
+      <button class="btn secondary" id="mainMenuBtn">🏠 Main Menu</button>
     </div>
+  </div>
 
-    <script>
-        // Game initialization
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        // --- REMOVED fixed canvas size. It will now be set dynamically. ---
-        // canvas.width = 800;
-        // canvas.height = 400;
+</div>
 
-        let gameState = {
-            player: { x: 200, y: 300, dx: 0, dy: 0, jumpCount: 0 },
-            obstacles: [],
-            coins: [],
-            score: 0,
-            highScore: localStorage.getItem('highScore') || 0,
-            isGameOver: false,
-            isPaused: false
-        };
+<script>
+(function(){
+  "use strict";
 
-        // Update high score display
-        document.getElementById('highScore').textContent = gameState.highScore;
+  // ---------- Persistent high score (per-device convenience) ----------
+  let highScore = 0;
+  try {
+    highScore = parseInt(localStorage.getItem('colorChaseHighScore') || '0', 10) || 0;
+  } catch(e) { highScore = 0; }
 
-        // --- ADDED: Function to handle resizing the game ---
-        function resizeGame() {
-            // Get the actual size the canvas is being displayed at
-            const newWidth = canvas.clientWidth;
-            const newHeight = canvas.clientHeight;
-            
-            // Update the drawing surface to match the new size
-            if (canvas.width !== newWidth || canvas.height !== newHeight) {
-                canvas.width = newWidth;
-                canvas.height = newHeight;
-            }
-        }
-        // --- END of added section ---
+  function saveHighScore(v){
+    highScore = v;
+    try { localStorage.setItem('colorChaseHighScore', String(v)); } catch(e) {}
+    document.getElementById('menuHigh').textContent = highScore;
+  }
+  document.getElementById('menuHigh').textContent = highScore;
 
-        // Touch handling
-        let activeTouches = new Set();
+  // ---------- Screen navigation ----------
+  function showScreen(id){
+    document.querySelectorAll('.screen, #gameScreen').forEach(el => el.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+  }
 
-        document.addEventListener('touchstart', e => {
-            e.preventDefault();
-            Array.from(e.touches).forEach(touch => {
-                const button = document.elementFromPoint(touch.clientX, touch.clientY);
-                if (button) handleButtonPress(button.id);
-            });
+  document.getElementById('playBtn').addEventListener('click', () => showScreen('levelScreen'));
+  document.getElementById('howToBtn').addEventListener('click', () => showScreen('howToScreen'));
+  document.getElementById('howToBackBtn').addEventListener('click', () => showScreen('homeScreen'));
+  document.getElementById('levelBackBtn').addEventListener('click', () => showScreen('homeScreen'));
+  document.getElementById('mainMenuBtn').addEventListener('click', () => showScreen('homeScreen'));
+  document.getElementById('playAgainBtn').addEventListener('click', () => startGame(currentSpeed));
+
+  document.querySelectorAll('.diff-card').forEach(card => {
+    card.addEventListener('click', () => startGame(parseFloat(card.dataset.speed)));
+  });
+
+  // ---------- Canvas setup ----------
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  let cssWidth = 0, cssHeight = 0;
+
+  function resizeCanvas(){
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    cssWidth = Math.max(1, Math.round(rect.width));
+    cssHeight = Math.max(1, Math.round(rect.height));
+    const targetW = Math.round(cssWidth * dpr);
+    const targetH = Math.round(cssHeight * dpr);
+    if (canvas.width !== targetW || canvas.height !== targetH) {
+      canvas.width = targetW;
+      canvas.height = targetH;
+    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  window.addEventListener('resize', () => { if (!document.getElementById('gameScreen').classList.contains('hidden')) resizeCanvas(); });
+  window.addEventListener('orientationchange', () => setTimeout(() => { if (!document.getElementById('gameScreen').classList.contains('hidden')) resizeCanvas(); }, 150));
+
+  // ---------- Input ----------
+  const activeKeys = new Set();
+
+  function pressStart(key){
+    activeKeys.add(key);
+    if (key === 'jump' && state && state.player.jumpCount < 2 && !state.isGameOver && !state.isPaused) {
+      state.player.dy = -16;
+      state.player.jumpCount++;
+      spawnParticles(state.player.x + 20, state.player.y + 40, '#cfd6ff', 6);
+    }
+  }
+  function pressEnd(key){ activeKeys.delete(key); }
+
+  ['left','right','jumpBtn'].forEach(id => {
+    const el = document.getElementById(id);
+    const key = id === 'jumpBtn' ? 'jump' : id;
+    el.addEventListener('touchstart', e => { e.preventDefault(); pressStart(key); }, {passive:false});
+    el.addEventListener('touchend', e => { e.preventDefault(); pressEnd(key); }, {passive:false});
+    el.addEventListener('touchcancel', e => { e.preventDefault(); pressEnd(key); }, {passive:false});
+    el.addEventListener('mousedown', e => { e.preventDefault(); pressStart(key); });
+    el.addEventListener('mouseup', e => { e.preventDefault(); pressEnd(key); });
+    el.addEventListener('mouseleave', () => pressEnd(key));
+  });
+
+  document.addEventListener('keydown', e => {
+    if (['ArrowLeft','ArrowRight','ArrowUp',' ','a','A','d','D','w','W'].includes(e.key)) e.preventDefault();
+    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') pressStart('left');
+    else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') pressStart('right');
+    else if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === ' ') pressStart('jump');
+  });
+  document.addEventListener('keyup', e => {
+    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') pressEnd('left');
+    else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') pressEnd('right');
+  });
+
+  document.getElementById('pauseBtn').addEventListener('click', togglePause);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && state && !state.isGameOver && !document.getElementById('gameScreen').classList.contains('hidden')) {
+      state.isPaused = true;
+      document.getElementById('pauseBtn').textContent = '▶️';
+    }
+  });
+
+  function togglePause(){
+    if (!state || state.isGameOver) return;
+    state.isPaused = !state.isPaused;
+    document.getElementById('pauseBtn').textContent = state.isPaused ? '▶️' : '⏸️';
+  }
+
+  // ---------- Game state ----------
+  let state = null;
+  let currentSpeed = 1;
+  let rafId = null;
+  let obstacleTimer = null;
+  let coinTimer = null;
+
+  function checkCollision(a, b, size){
+    return a.x < b.x + size && a.x + 35 > b.x && a.y < b.y + size && a.y + 35 > b.y;
+  }
+
+  function spawnParticles(x, y, color, amount){
+    for (let i = 0; i < amount; i++){
+      state.particles.push({
+        x, y,
+        vx: (Math.random() - 0.5) * 8,
+        vy: (Math.random() - 0.5) * 8,
+        life: 1, color
+      });
+    }
+  }
+
+  function spawnFloatingText(x, y, text, color){
+    state.floatingTexts.push({ x, y, text, color, life: 1 });
+  }
+
+  function startGame(speed){
+    currentSpeed = speed;
+    showScreen('gameScreen');
+    resizeCanvas();
+
+    if (rafId) cancelAnimationFrame(rafId);
+    if (obstacleTimer) clearInterval(obstacleTimer);
+    if (coinTimer) clearInterval(coinTimer);
+
+    state = {
+      player: { x: 40, y: 40, dx: 0, dy: 0, jumpCount: 0 },
+      obstacles: [], coins: [], particles: [], floatingTexts: [],
+      score: 0, gems: 0, baseSpeed: 1,
+      isGameOver: false, isPaused: false
+    };
+
+    document.getElementById('score').textContent = '0';
+    document.getElementById('gems').textContent = '0';
+    document.getElementById('highScore').textContent = highScore;
+    document.getElementById('pauseBtn').textContent = '⏸️';
+
+    const spawnRate = 2000 / speed;
+    obstacleTimer = setInterval(() => {
+      if (!state.isGameOver && !state.isPaused && cssWidth > 0) {
+        state.obstacles.push({
+          x: cssWidth + 50,
+          y: cssHeight - 60,
+          emoji: ["🚧","🔥","👾"][Math.floor(Math.random()*3)]
         });
+      }
+    }, spawnRate);
 
-        document.addEventListener('touchend', e => {
-            e.preventDefault();
-            activeTouches.clear();
+    coinTimer = setInterval(() => {
+      if (!state.isGameOver && !state.isPaused && cssWidth > 0) {
+        state.coins.push({
+          x: cssWidth + 50,
+          y: cssHeight - 40 - Math.random() * Math.min(180, cssHeight - 80)
         });
+      }
+    }, spawnRate * 0.8);
 
-        document.addEventListener('mousedown', e => {
-            if (e.target.closest('button')) handleButtonPress(e.target.id);
-        });
+    function loop(){
+      update();
+      draw();
+      if (!state.isGameOver) rafId = requestAnimationFrame(loop);
+    }
+    loop();
+  }
 
-        // Keyboard handling for PC/Laptop
-        document.addEventListener('keydown', e => {
-            switch(e.key) {
-                case 'ArrowLeft':
-                case 'a':
-                    activeTouches.add('left');
-                    break;
-                case 'ArrowRight':
-                case 'd':
-                    activeTouches.add('right');
-                    break;
-                case 'ArrowUp':
-                case 'w':
-                case ' ': // Spacebar for jump
-                    e.preventDefault(); // Prevent page scroll on spacebar
-                    if (!gameState.isGameOver && !gameState.isPaused && gameState.player.jumpCount < 2) {
-                        gameState.player.dy = -12;
-                        gameState.player.jumpCount++;
-                    }
-                    break;
-            }
-        });
+  function update(){
+    if (state.isGameOver || state.isPaused) return;
 
-        document.addEventListener('keyup', e => {
-            switch(e.key) {
-                case 'ArrowLeft':
-                case 'a':
-                    activeTouches.delete('left');
-                    break;
-                case 'ArrowRight':
-                case 'd':
-                    activeTouches.delete('right');
-                    break;
-            }
-        });
+    state.baseSpeed += 0.001;
+    const moveSpeed = 6 * currentSpeed;
+    const scrollSpeed = 4 * currentSpeed * state.baseSpeed;
 
-        function handleButtonPress(id) {
-            activeTouches.add(id);
-            if (id === 'jump' && gameState.player.jumpCount < 2) {
-                gameState.player.dy = -12;
-                gameState.player.jumpCount++;
-            } else if (id === 'playButton') {
-                gameState.isPaused = false;
-            } else if (id === 'pauseButton') {
-                gameState.isPaused = true;
-            } else if (id === 'restartButton') {
-                resetGame();
-            }
-        }
+    state.player.dx = 0;
+    if (activeKeys.has('left')) state.player.dx = -moveSpeed;
+    if (activeKeys.has('right')) state.player.dx = moveSpeed;
 
-        // Game loop
-        function update() {
-            if (gameState.isGameOver || gameState.isPaused) return;
+    state.player.x = Math.max(0, Math.min(cssWidth - 40, state.player.x + state.player.dx));
+    state.player.y += state.player.dy;
 
-            // Horizontal movement
-            gameState.player.dx = 0;
-            if (activeTouches.has('left')) gameState.player.dx = -7;
-            if (activeTouches.has('right')) gameState.player.dx = 7;
+    const groundY = cssHeight - 30;
+    if (state.player.y + 45 < groundY) {
+      state.player.dy += 0.5;
+    } else {
+      state.player.y = groundY - 45;
+      state.player.dy = 0;
+      state.player.jumpCount = 0;
+    }
 
-            // Update positions
-            gameState.player.x = Math.max(0, Math.min(canvas.width - 50, gameState.player.x + gameState.player.dx));
-            gameState.player.y += gameState.player.dy;
+    state.obstacles.forEach(o => o.x -= scrollSpeed);
+    state.coins.forEach(c => c.x -= scrollSpeed);
 
-            // Gravity
-            // --- MODIFIED: Use canvas.height for dynamic ground position ---
-            const groundY = canvas.height - 50;
-            if (gameState.player.y + 50 < groundY) {
-                gameState.player.dy += 0.5;
-            } else {
-                gameState.player.y = groundY - 50; // Place player on the ground
-                gameState.player.dy = 0;
-                gameState.player.jumpCount = 0;
-            }
+    state.particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.life -= 0.05; });
+    state.particles = state.particles.filter(p => p.life > 0);
 
-            // Update objects
-            gameState.obstacles.forEach(o => o.x -= 5);
-            gameState.coins.forEach(c => c.x -= 5);
+    state.floatingTexts.forEach(ft => { ft.y -= 1.5; ft.life -= 0.03; });
+    state.floatingTexts = state.floatingTexts.filter(ft => ft.life > 0);
 
-            // Collision detection
-            gameState.obstacles.forEach(obstacle => {
-                if (checkCollision(gameState.player, obstacle)) {
-                    gameOver();
-                }
-            });
+    for (const obstacle of state.obstacles) {
+      if (checkCollision(state.player, obstacle, 35)) { gameOver(); return; }
+    }
 
-            gameState.coins.forEach((coin, index) => {
-                if (checkCollision(gameState.player, coin)) {
-                    gameState.score += 3;
-                    gameState.coins.splice(index, 1);
-                    document.getElementById('score').textContent = gameState.score;
-                }
-            });
-        }
+    state.coins = state.coins.filter(coin => {
+      if (checkCollision(state.player, coin, 25)) {
+        state.score += 5;
+        state.gems += 1;
+        spawnParticles(coin.x, coin.y, '#ffd166', 8);
+        spawnFloatingText(coin.x, coin.y, '+5', '#ffd166');
+        document.getElementById('score').textContent = state.score;
+        document.getElementById('gems').textContent = state.gems;
+        return false;
+      }
+      return true;
+    });
 
-        function draw() {
-            // --- ADDED: Check canvas size before every draw call ---
-            resizeGame();
+    state.obstacles = state.obstacles.filter(o => o.x > -60);
+    state.coins = state.coins.filter(c => c.x > -60);
+  }
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw player
-            ctx.font = "60px Arial";
-            ctx.fillStyle = "#ff3366";
-            ctx.fillText('😎', gameState.player.x, gameState.player.y);
+  function draw(){
+    ctx.clearRect(0, 0, cssWidth, cssHeight);
 
-            // Draw objects
-            ctx.font = "40px Arial";
-            gameState.obstacles.forEach(o => {
-                ctx.fillStyle = o.color;
-                ctx.fillText(o.emoji, o.x, o.y);
-            });
+    state.particles.forEach(p => {
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
 
-            gameState.coins.forEach(c => {
-                ctx.fillStyle = "#ffd700";
-                ctx.fillText('💰', c.x, c.y);
-            });
-        }
+    ctx.font = "38px Arial";
+    ctx.fillText('😎', state.player.x, state.player.y + 35);
 
-        function checkCollision(a, b) {
-            return a.x < b.x + b.width &&
-                   a.x + 50 > b.x &&
-                   a.y < b.y + b.height &&
-                   a.y + 50 > b.y;
-        }
+    ctx.font = "34px Arial";
+    state.obstacles.forEach(o => ctx.fillText(o.emoji, o.x, o.y + 30));
+    state.coins.forEach(c => ctx.fillText('💎', c.x, c.y + 25));
 
-        function gameOver() {
-            gameState.isGameOver = true;
+    state.floatingTexts.forEach(ft => {
+      ctx.globalAlpha = Math.max(0, ft.life);
+      ctx.fillStyle = ft.color;
+      ctx.font = "bold 22px Arial";
+      ctx.fillText(ft.text, ft.x, ft.y);
+    });
+    ctx.globalAlpha = 1;
+  }
 
-            // Update high score
-            if (gameState.score > gameState.highScore) {
-                gameState.highScore = gameState.score;
-                localStorage.setItem('highScore', gameState.highScore);
-                document.getElementById('highScore').textContent = gameState.highScore;
-            }
+  function gameOver(){
+    state.isGameOver = true;
+    spawnParticles(state.player.x, state.player.y, '#ff3d81', 26);
+    draw();
+    clearInterval(obstacleTimer);
+    clearInterval(coinTimer);
 
-            // Show funny performance message
-            const performanceText = document.getElementById('performanceText');
-            const difference = gameState.highScore - gameState.score;
-            let message;
+    const isNewHigh = state.score > highScore;
+    if (isNewHigh) saveHighScore(state.score);
+    document.getElementById('highScore').textContent = highScore;
 
-            if (gameState.score > 0 && gameState.score >= gameState.highScore) {
-                message = "🎉 Wow! You're a LEGEND! 🎉<br>You just set a new high score!";
-            } else if (difference <= 50) {
-                message = "😲 So close! You were just " + difference + " points away from the high score!";
-            } else if (difference <= 100) {
-                message = "🤔 Not bad! But you're still " + difference + " points behind the high score.";
-            } else {
-                message = "😅 Oops! You're " + difference + " points away from the high score. Better luck next time!";
-            }
+    const perf = document.getElementById('performanceText');
+    let message;
+    if (isNewHigh && state.score > 0) {
+      message = "🎉 New high score! You're a legend.";
+    } else {
+      const diff = highScore - state.score;
+      if (diff <= 20) message = "😲 So close! Just " + diff + " points off your best.";
+      else if (diff <= 60) message = "🤔 Not bad — " + diff + " points behind your best.";
+      else message = "😅 " + diff + " points off your best. Try again!";
+    }
 
-            performanceText.innerHTML = `Game Over!<br>Your Score: ${gameState.score}<br>${message}`;
-            document.getElementById('gameOverMessage').style.display = 'block';
+    perf.innerHTML = "Score: <b>" + state.score + "</b><br>Gems collected: 💎 " + state.gems + "<br><br>" + message;
 
-            // Restart the game after 5 seconds
-            setTimeout(() => {
-                resetGame();
-            }, 5000);
-        }
+    setTimeout(() => showScreen('gameOverScreen'), 500);
+  }
 
-        function resetGame() {
-            gameState = {
-                player: { x: canvas.width / 4, y: canvas.height - 100, dx: 0, dy: 0, jumpCount: 0 }, // Use dynamic start positions
-                obstacles: [],
-                coins: [],
-                score: 0,
-                highScore: localStorage.getItem('highScore') || 0,
-                isGameOver: false,
-                isPaused: false
-            };
-            document.getElementById('score').textContent = 0;
-            document.getElementById('gameOverMessage').style.display = 'none';
-        }
-
-        // Object creation
-        setInterval(() => {
-            if (!gameState.isGameOver && !gameState.isPaused) {
-                gameState.obstacles.push({
-                    x: canvas.width,
-                    y: canvas.height - 80, // --- MODIFIED: Dynamic Y position
-                    width: 50,
-                    height: 50,
-                    emoji: ["🚧","🚗","👾"][Math.floor(Math.random()*3)],
-                    color: ["#ff5555","#55ff55","#8888ff"][Math.floor(Math.random()*3)]
-                });
-            }
-        }, 2000);
-
-        setInterval(() => {
-            if (!gameState.isGameOver && !gameState.isPaused) {
-                gameState.coins.push({
-                    x: canvas.width,
-                    y: Math.random() * (canvas.height - 150) + 50,
-                    width: 30,
-                    height: 30
-                });
-            }
-        }, 1500);
-
-        // Start game
-        function gameLoop() {
-            update();
-            draw();
-            requestAnimationFrame(gameLoop);
-        }
-        
-        // --- ADDED: Listen for window resize events to adjust the game ---
-        window.addEventListener('resize', resizeGame);
-
-        // --- ADDED: Initialize the game size on first load ---
-        resetGame(); 
-        
-        gameLoop();
-    </script>
+})();
+</script>
 </body>
 </html>
-i
