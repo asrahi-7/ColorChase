@@ -2,9 +2,9 @@ Color Chase
 
 *An endless, fast-paced web runner. Dodge, jump, and grab every gem!*
 
-**[🎮 Play RapidRun Live Here!](https://asrahi-7.github.io/ColorChase/)**
+**[🎮 Play ColorChase Live Here!](https://asrahi-7.github.io/ColorChase/)**
 
-**RapidRun** (in-game title: *Color Chase*) is a highly responsive, physics-based infinite runner built entirely with pure web technologies. Control your emoji hero, weave through dangerous obstacles, and rack up high scores as the game's speed progressively ramps up. 
+**** (in-game title: *Color Chase*) is a highly responsive, physics-based infinite runner built entirely with pure web technologies. Control your emoji hero, weave through dangerous obstacles, and rack up high scores as the game's speed progressively ramps up. 
 
 I developed this game as a lightweight, zero-dependency project to demonstrate smooth HTML5 Canvas rendering and responsive game loops across desktop and mobile devices.
 
@@ -44,10 +44,10 @@ Want to explore the code or run it on your own machine? It requires no build too
 
 ```bash
 # Clone the repository
-git clone [https://github.com/asrahi-7/RapidRun.git](https://github.com/asrahi-7/RapidRun.git)
+git clone [https://github.com/asrahi-7/.git](https://github.com/asrahi-7/ColorChase.git)
 
 # Navigate into the project folder
-cd RapidRun
+cd ColorChase
 
 # Open the index.html file in your browser
 # (On Windows, you can just double-click index.html)
