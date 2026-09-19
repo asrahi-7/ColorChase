@@ -1,61 +1,53 @@
-🏃‍♂️ Color Chase
-Dodge, jump, and grab every gem you can in this fast-paced infinite runner!
+Color Chase
 
-🎮 Play Color Chase Live!
+*An endless, fast-paced web runner. Dodge, jump, and grab every gem!*
 
-Color Chase (hosted as RapidRun) is an endless runner web game where reflexes are everything. Control your emoji hero, avoid deadly obstacles, collect shiny gems, and survive as the game's speed progressively ramps up.
+**[🎮 Play RapidRun Live Here!](https://asrahi-7.github.io/RapidRun/)**
 
-✨ Features
-Progressive Difficulty: The longer you survive, the faster the game gets.
+**RapidRun** (in-game title: *Color Chase*) is a highly responsive, physics-based infinite runner built entirely with pure web technologies. Control your emoji hero, weave through dangerous obstacles, and rack up high scores as the game's speed progressively ramps up. 
 
-Three Speed Modes: Choose your starting pace: Chill (Easy), Steady (Normal), or Fast (Hard).
+I developed this game as a lightweight, zero-dependency project to demonstrate smooth HTML5 Canvas rendering and responsive game loops across desktop and mobile devices.
 
-Double Jump Mechanic: Time your jumps perfectly to clear wide gaps and tall obstacles.
+## ✨ Features
 
-Juicy Visuals: Enjoy smooth HTML5 Canvas rendering, custom particle explosions, and floating score texts.
+*   **Progressive Difficulty:** The game dynamically accelerates the longer you survive, testing your reflexes.
+*   **3 Difficulty Modes:** Choose your starting speed: Chill (Easy), Steady (Normal), or Fast (Hard).
+*   **Double Jump Mechanics:** Time your jumps to clear wide gaps and tall barricades.
+*   **Custom Particle Engine:** Enjoy smooth, math-driven particle explosions and floating combat text using HTML5 Canvas.
+*   **Cross-Platform Controls:** Fully optimized for both desktop (Keyboard) and mobile (Touch).
+*   **Local Storage Memory:** High scores are saved directly to your browser natively.
 
-Responsive Controls: Fully optimized for both desktop keyboards and mobile touch screens.
+## 🕹️ How to Play
 
-Persistent High Scores: Your best score is saved directly to your browser's local storage.
+**Desktop / Keyboard:**
+*   **Move:** `Left / Right Arrows` or `A / D`
+*   **Jump:** `Up Arrow`, `W`, or `Spacebar` *(Tap twice in mid-air to Double Jump!)*
 
-🕹️ Controls
-Desktop / Keyboard:
+**Mobile / Touch:**
+*   Use the intuitive on-screen **Left (⬅️)**, **Right (➡️)**, and **Jump (🦘)** buttons.
 
-Move Left / Right: Left/Right Arrow Keys or A / D
+## 🚧 The World
+*   **You:** 😎 
+*   **Collect:** 💎 Gems (+5 Points)
+*   **Avoid:** 🚧 Barricades, 🔥 Fire, and 👾 Aliens (Instant Game Over!)
 
-Jump: Up Arrow, W, or Spacebar (Press twice to Double Jump!)
+## 🛠️ Tech Stack
 
-Mobile / Touch:
+This project was built from scratch without any external libraries or game engines:
+*   **HTML5:** DOM structure and `Canvas API` for the game rendering.
+*   **CSS3:** Glassmorphism UI, flexbox layouts, and fully responsive design.
+*   **Vanilla JavaScript (ES6+):** Custom physics engine, collision detection, game state management, and requestAnimationFrame game loop.
 
-Use the intuitive on-screen Left (⬅️), Right (➡️), and Jump (🦘) action buttons.
+## 🚀 Running Locally
 
-🚧 Gameplay Elements
-Hero: 😎 You!
+Want to explore the code or run it on your own machine? It requires no build tools or servers.
 
-Collectibles: 💎 Gems (Grants +5 Points)
-
-Obstacles: 🚧 Barricades, 🔥 Fire, and 👾 Aliens (Avoid at all costs!)
-
-🛠️ Tech Stack
-HTML5: Structure and Canvas API for the game loop and rendering.
-
-CSS3: Styling, glassmorphism UI elements, and responsive layouts.
-
-Vanilla JavaScript (ES6+): Game physics, collision detection, particle system, and state management. Zero external libraries.
-
-🚀 Running Locally
-To play, test, or modify the game on your own machine, clone the repository and open the index.html file in any modern browser.
-
-Bash
+```bash
 # Clone the repository
-git clone https://github.com/asrahi-7/RapidRun.git
+git clone [https://github.com/asrahi-7/RapidRun.git](https://github.com/asrahi-7/RapidRun.git)
 
-# Navigate to the directory
+# Navigate into the project folder
 cd RapidRun
 
-# Open in your default browser (macOS)
-open index.html 
-
-# On Windows use: start index.html
-# On Linux use: xdg-open index.html
-Made with ❤️ by asrahi-7
+# Open the index.html file in your browser
+# (On Windows, you can just double-click index.html)
