@@ -1,34 +1,61 @@
-# 🎮 Rapid Runner - A Vibrant Runner Game
+🏃‍♂️ Color Chase
+Dodge, jump, and grab every gem you can in this fast-paced infinite runner!
 
-![Demo](https://img.shields.io/badge/Demo-Live_Game-blue) 
-![Tech](https://img.shields.io/badge/Built_with-HTML%20%7C%20CSS%20%7C%20JS-orange)
+🎮 Play Color Chase Live!
 
-(Update 1.1):-18-02-2025
-(Update 1.2):-02-03-2025
+Color Chase (hosted as RapidRun) is an endless runner web game where reflexes are everything. Control your emoji hero, avoid deadly obstacles, collect shiny gems, and survive as the game's speed progressively ramps up.
 
-A colorful endless runner game with emoji-powered graphics and dynamic controls. Jump, dodge, and collect coins in this browser-based arcade experience!
+✨ Features
+Progressive Difficulty: The longer you survive, the faster the game gets.
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/yourusername/emoji-color-chase/main/screenshots/gameplay.gif" width="600" alt="Gameplay Demo">
-</p>
+Three Speed Modes: Choose your starting pace: Chill (Easy), Steady (Normal), or Fast (Hard).
 
-## ✨ Features
-- 🦘 **Emoji-based characters** (Kangaroo jumper, obstacles, and coins)
-- 🎨 **Dynamic color-changing background** with gradient animations
-- 🕹️ **Mobile-first controls** with multi-touch support
-- ⭐ **Score tracking** with local high score system
-- 💥 Progressive difficulty with random obstacles (🚧, 🚗, 👾)
-- 🌈 Responsive design for all screen sizes
-- 🌙 Night mode
+Double Jump Mechanic: Time your jumps perfectly to clear wide gaps and tall obstacles.
 
-## 🕹️ How to Play
-1. **Avoid obstacles** while **collecting coins** (💰 = +03 points)
-2. Use **double jump** mechanics for advanced maneuvers
-3. Beat your high score and dominate the leaderboard!
+Juicy Visuals: Enjoy smooth HTML5 Canvas rendering, custom particle explosions, and floating score texts.
 
-### Controls
-| Desktop           | Mobile           | Action          |
-|-------------------|------------------|-----------------|
-| `Left Arrow`      | `⬅️ Button`      | Move Left       |
-| `Space`           | `🦘 Button`       | Jump/Double Jump|
-| `Right Arrow`     | `➡️ Button`      | Move Right      |
+Responsive Controls: Fully optimized for both desktop keyboards and mobile touch screens.
+
+Persistent High Scores: Your best score is saved directly to your browser's local storage.
+
+🕹️ Controls
+Desktop / Keyboard:
+
+Move Left / Right: Left/Right Arrow Keys or A / D
+
+Jump: Up Arrow, W, or Spacebar (Press twice to Double Jump!)
+
+Mobile / Touch:
+
+Use the intuitive on-screen Left (⬅️), Right (➡️), and Jump (🦘) action buttons.
+
+🚧 Gameplay Elements
+Hero: 😎 You!
+
+Collectibles: 💎 Gems (Grants +5 Points)
+
+Obstacles: 🚧 Barricades, 🔥 Fire, and 👾 Aliens (Avoid at all costs!)
+
+🛠️ Tech Stack
+HTML5: Structure and Canvas API for the game loop and rendering.
+
+CSS3: Styling, glassmorphism UI elements, and responsive layouts.
+
+Vanilla JavaScript (ES6+): Game physics, collision detection, particle system, and state management. Zero external libraries.
+
+🚀 Running Locally
+To play, test, or modify the game on your own machine, clone the repository and open the index.html file in any modern browser.
+
+Bash
+# Clone the repository
+git clone https://github.com/asrahi-7/RapidRun.git
+
+# Navigate to the directory
+cd RapidRun
+
+# Open in your default browser (macOS)
+open index.html 
+
+# On Windows use: start index.html
+# On Linux use: xdg-open index.html
+Made with ❤️ by asrahi-7
